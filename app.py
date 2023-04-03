@@ -359,10 +359,6 @@ def get_local():
 
 
         
-    
-##ToDO###
-def remove_dead():
-    return [] # [192.168.1.1,192.168.1.2]
 
 
 ##ToDO###
@@ -391,6 +387,30 @@ def update_save_json(remote_data):
     #f.close()
     
 
+@app.route('/api/clear', methods=['GET','POST'])
+def remove_dead():
+    global network_state
+    network_state=[]
+    return "True" # [192.168.1.1,192.168.1.2]
+    
+@app.route('/api/clearall', methods=['GET','POST'])
+def remove_all_dead():
+    global network_state  
+    global all_found_ips
+    
+    for ip in all_found_ips:
+        #if local_ip==None: continue
+        if local_ip in ip: continue
+            
+        try:
+            requests.post("http://"+ip+''':8090/api/clear''')
+            print("Cleared "+ip+" of current state")
+
+        except:
+            print("Failed to talk to..."+str(ip))
+            failed_ip.append(ip)
+    requests.post("http://"+get_ip()+''':8090/api/clear''')
+    return "True"
     
 
 # updates in record of other nodes information 
